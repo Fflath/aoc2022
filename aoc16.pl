@@ -106,8 +106,8 @@ action2(move-D1), [(p1-(D1,TimeN), p2-(L2,T2), pressure-PressureN, seen-[D1|Been
     --> [(p1-(L1,T1), p2-(L2,T2),pressure-Pressure, seen-BeenTo)], {
     T1 #=< T2, T1 #< 30,
     distance(L1,D1,Dist),
-    not(valve_flow(D1,0)),
-    not(member(D1,BeenTo)),
+    F #/= 0, valve_flow(D1,F),
+    maplist(dif(D1), BeenTo),
     TimeN #= T1 + Dist + 1,
     open_valve(D1, TimeN, P0),
     PressureN #= Pressure + P0
@@ -117,8 +117,8 @@ action2(move-D2), [(p1-(L1,T1), p2-(D2,TimeN), pressure-PressureN, seen-[D2|Been
     --> [(p1-(L1,T1), p2-(L2,T2),pressure-Pressure,seen-BeenTo)], {
     T2 #< T1, T2 #< 30,
     distance(L2,D2,Dist),
-    not(valve_flow(D2,0)),
-    not(member(D2,BeenTo)),
+    F #/= 0, valve_flow(D2,F),
+    maplist(dif(D2), BeenTo),
     TimeN #= T2 + Dist + 1,
     open_valve(D2, TimeN, P0),
     PressureN #= Pressure + P0

@@ -14,7 +14,7 @@ input([C|Cs])    --> block(Cals),{sum_list(Cals,C)}, input(Cs).
 
 
 block([C|Cs])   --> int_line(C),block(Cs).
-block([])       --> empty_line | [], !.
+block([])       --> empty_line | !.
 
 eos([], []).
 
