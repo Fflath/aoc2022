@@ -7,6 +7,7 @@
 :- use_module(utils).
 
 
+
 valve(Code-Flow) --> "Valve ",valve_code(Code)," has flow rate=",integer(Flow),";".
 
 valve_code((C1,C2)) --> letter(C1),letter(C2).

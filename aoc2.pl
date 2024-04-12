@@ -1,8 +1,7 @@
-:- set_prolog_flag(double_quotes, codes).
-:- use_module(library(dcg/basics)).
+:- use_module(library(dcgs)).
+:- use_module(dcg_utils).   
 :- use_module(library(pio)).
-:- use_module(library(clpfd)).
-:- use_module(library(func)).
+:- use_module(library(lists)).
 
 results(X,X,draw).
 results(rock,paper,win).
@@ -29,35 +28,38 @@ p2(rock)     --> "X".
 p2(paper)    --> "Y".
 p2(scissors) --> "Z".
 
-game([])        --> call(eos), !.
-game([R|Rs]) --> round(R), game(Rs).
 round((P1,P2))    --> p1(P1), " ", p2(P2), "\n".
-eos([], []).
+game(G) --> sequence(round,G).
 
-score_list([])  --> [].
-score_list([R|Rs])  --> s1(R), score_list(Rs). 
-s1((P1, P2)),[Score]            --> [S0],{
-    results(P1,P2,R), score(R,RV),
-    score(P2, PV),
-    Score #= S0 + RV + PV}.
+s1((P1,P2),Score) :- 
+    results(P1,P2,R), 
+    score(R,RV),
+    score(P2,PV),
+    Score #= RV + PV.
 
-p1 :- phrase_from_file(game(Rs), "d2.txt"), phrase(score_list(Rs),[0], [X]), write(X).
+sum_(L,S0,S) :- S #= L + S0.
+
+p1 :-   phrase_from_file(game(Rs), "d2.txt"), 
+        maplist(s1, Rs, Ss),
+        foldl(sum_,Ss,0,X),
+        write(X).
 
 
 t2(loss)    --> "X".
 t2(draw)    --> "Y".
 t2(win)     --> "Z".
 
-game2([])        --> call(eos), !.
-game2([R|Rs]) --> round2(R), game2(Rs).
 round2((P1,P2))    --> p1(P1), " ", t2(P2), "\n".
-score_list2([])  --> [].
-score_list2([R|Rs])  --> s2(R), score_list2(Rs). 
-s2((P1, R)),[Score]            --> [S0],{
+game2(G) --> sequence(round2,G).
+
+s2((P1,R),Score):-
     results(P1,P2,R),
     score(R,RV),
     score(P2, PV),
-    Score #= S0 + RV + PV}.
+    Score #= RV + PV.
 
 
-p2 :- phrase_from_file(game2(Rs), "d2.txt"), phrase(score_list2(Rs),[0], [X]), write(X).
+p2 :-   phrase_from_file(game2(Rs), "d2.txt"), 
+        maplist(s2,Rs,Ss),
+        foldl(sum_,Ss,0,X),
+        write(X).

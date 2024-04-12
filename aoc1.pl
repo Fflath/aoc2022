@@ -1,32 +1,23 @@
-:- set_prolog_flag(double_quotes, codes).
-:- use_module(library(dcg/basics)).
+:- use_module(library(dcgs)).
+:- use_module(dcg_utils).   
 :- use_module(library(pio)).
-:- use_module(library(clpfd)).
-:- use_module(library(func)).
 
 int_line(I) --> integer(I),"\n".
 empty_line  --> "\n".
-... --> [] | [_], ... .
 
+block(C)   --> sequence(int_line,Is), empty_line, {sum_list(Is,C)}.
 
-input([])        --> call(eos), !.
-input([C|Cs])    --> block(Cals),{sum_list(Cals,C)}, input(Cs).
-
-
-block([C|Cs])   --> int_line(C),block(Cs).
-block([])       --> empty_line | !.
-
-eos([], []).
 
 p1 :- 
-    phrase_from_file(input(N), "d1.txt"), max_list(N,M),
+    phrase_from_file(sequence(block,N), "d1.txt"), 
+    list_max(N,M),
     write(M).
 
 p2 :-
-    phrase_from_file(input(N), "d1.txt"),
-    N2 = reverse $ sort $ N,
+    phrase_from_file(sequence(block,N), "d1.txt"),
+    sort(N,N2), reverse(N2,N3),
     length(A, 3),
-    append(A, _, N2),
+    append(A, _, N3),
     sum_list(A,Sum), 
     write(Sum).
 
