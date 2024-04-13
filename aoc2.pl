@@ -58,7 +58,6 @@ s2((P1,R),Score):-
     score(P2, PV),
     Score #= RV + PV.
 
-
 p2 :-   phrase_from_file(game2(Rs), "d2.txt"), 
         maplist(s2,Rs,Ss),
         foldl(sum_,Ss,0,X),

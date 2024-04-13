@@ -1,14 +1,13 @@
-:- set_prolog_flag(double_quotes, codes).
-:- use_module(library(dcg/basics)).
+:- use_module(library(dcgs)).
 :- use_module(library(pio)).
-:- use_module(library(clpfd)).
-:- use_module(library(func)).
+:- use_module(library(clpz)).
+:- use_module(dcg_utils).   
+:- use_module(library(lists)).
 
 lookup("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ").
 priority(A,P) :- lookup(X), nth1(P,X,A).
 
-lines([])        --> call(eos), !.
-lines([S|Ss])   --> line(S),lines(Ss).
+lines(Ls)   --> sequence(line,Ls).
 line(P)     --> string(Line), "\n", {
         length(R1,L), length(R2,L),
         append(R1,R2,Line),
@@ -16,12 +15,11 @@ line(P)     --> string(Line), "\n", {
         member(S,R2),
         priority(S,P)
     }.
-eos([], []).
 
 p1 :- phrase_from_file(lines(In),"d3.txt"),sum_list(In,Out),write(Out).
 
-lines2([]) --> call(eos), !.
-lines2([S|Ss]) --> line2(S), lines2(Ss).
+
+lines2(Ls)  --> sequence(line2,Ls).
 line2(P)    --> string(L1),"\n",string(L2),"\n",string(L3),"\n",
 {
     member(I,L1),member(I,L2),member(I,L3),

@@ -1,9 +1,9 @@
-:- set_prolog_flag(double_quotes, codes).
-:- use_module(library(dcg/basics)).
+:- use_module(library(dcgs)).
+:- use_module(dcg_utils).   
 :- use_module(library(pio)).
-:- use_module(library(clpfd)).
-:- use_module(library(func)).
-:- use_module(reif).
+:- use_module(library(clpz)).
+:- use_module(library(reif)).
+:- use_module(library(lists)).
 
 between(X,Y,Z,true) :- Z #>= X, Z #=< Y.
 between(X,_Y,Z,false) :- Z #=< X.
@@ -28,10 +28,11 @@ overlap((A-B,X-Y),false):- between(X,Y,A,false), between(X,Y,B,false).
 
 
 line((A-B,X-Y)) --> integer(A),"-",integer(B),",",integer(X),"-",integer(Y),"\n".
+lines(Ss)   --> sequence(line,Ss).
 
-lines([])        --> call(eos), !.
-lines([S|Ss])   --> line(S),lines(Ss).
-eos([], []).
+p1 :-   phrase_from_file(lines(In),"d4.txt"),
+        tfilter(all_in,In,Out),
+        length(Out, X), 
+        write(X).
 
-p1 :-  phrase_from_file(lines(In),"d4.txt"),tfilter(all_in,In,Out),length(Out, X), write(X).
 p2 :-  phrase_from_file(lines(In),"d4.txt"),tfilter(overlap,In,Out),length(Out, X), write(X).

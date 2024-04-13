@@ -11,7 +11,8 @@
         sequence//2,
         sequence//3,
         wrap//4,
-        list//1
+        list//1,
+        string//1
     ]).
 
 :- use_module(library(lists)).
@@ -43,4 +44,4 @@ list(L)                         --> "[",sequence(alpha_numeric,',',L),"]".
 digits([D|Ds])          --> digit(D),sequence(digit,Ds).
 integer(I)          --> digits(Ds),{number_chars(I,Ds)}.
 alpha_numeric(C)    --> alpha_lower(C) | alpha_upper(C) | digit(C).
-
+string(S)           --> sequence(alpha_numeric,S).
