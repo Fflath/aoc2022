@@ -59,7 +59,8 @@ p1(Out) :-
     list_to_assoc(O,State0),
     phrase(run_instructions(Is),[State0],[State1]),
     assoc_to_values(State1,State2),
-    maplist(nth1(1),State2, Out).
+    maplist(nth1(1),State2, State3),
+    phrase(seqq(State3),Out).
 
 p2(Out) :- 
     phrase_from_file((map(M),...,instructions(Is)),"d5.txt"),
@@ -69,4 +70,5 @@ p2(Out) :-
     list_to_assoc(O,State0),
     phrase(run9001_instructions(Is),[State0],[State1]),
     assoc_to_values(State1,State2),
-    maplist(nth1(1),State2, Out).
+    maplist(nth1(1),State2, State3),
+    phrase(seqq(State3),Out).

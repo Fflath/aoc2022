@@ -87,3 +87,4 @@ count(Element, [Head|Tail], Count,CountN) :- dif(Element,Head), count(Element,Ta
 
 absF(X,Y) :- X#<0,Y#= -1*X.
 absF(X,X) :- X#>=0.
+
