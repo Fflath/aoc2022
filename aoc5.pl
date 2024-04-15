@@ -1,10 +1,3 @@
-:- module(aoc5,
-    [
-        row//1,
-        instruction//1,
-        zip/2
-    ]).
-
 :- use_module(library(dcgs)).
 :- use_module(dcg_utils).   
 :- use_module(library(pio)).
@@ -12,11 +5,8 @@
 :- use_module(library(reif)).
 :- use_module(library(assoc)).
 :- use_module(utils).
-
-% :- meta_predicate row(3,?,?,?).
-% :- meta_predicate row(1,?).
-% :- meta_predicate instruction(3,?,?,?).
-
+:- use_module(library(lists)).
+:- use_module(library(dif)).
 
 stack_op(S,V,[V|S]).
 
@@ -40,24 +30,18 @@ state_change9001((Count,Src,Dst),State,StateN) :-
 crate(C)     --> "[",string(C),"]".
 crate(nil)   --> "   ".
 row(Cs)     --> sequence(crate," ",Cs).
+map(M)      --> sequence(row,"\n",M).
 
 not_nil(nil,false).
 not_nil(X,true) :- dif(X,nil).
 
-% zip([[],[],[],[],[],[],[],[],[]],[]).
-% zip([[H1|T1],[H2|T2],[H3|T3],[H4|T4],[H5|T5],[H6|T6],[H7|T7],[H8|T8]],[H1,H2,H3,H4,H5,H6,H7,H8|T9]) :- 
-%     aoc5:zip([T1,T2,T3,T4,T5,T6,T7,T8],T9).
 
-
-zip([[],[],[],[],[],[],[],[]],[]).
-zip([[H1|T1],[H2|T2],[H3|T3],[H4|T4],[H5|T5],[H6|T6],[H7|T7],[H8|T8]],[H1,H2,H3,H4,H5,H6,H7,H8|T9]) :- 
-    zip([T1,T2,T3,T4,T5,T6,T7,T8],T9).
-
-weave([],[]).
-weave([H|T],[H1|T1]) :- zip(H,L),weave(T,L).
+weave([[],[],[],[],[],[],[],[]],[]).
+weave([[H1|T1],[H2|T2],[H3|T3],[H4|T4],[H5|T5],[H6|T6],[H7|T7],[H8|T8]],[[H1,H2,H3,H4,H5,H6,H7,H8]|T9]) :- 
+    weave([T1,T2,T3,T4,T5,T6,T7,T8],T9).
 
 instruction((Count,Src,Dst)) --> "move ",integer(Count)," from ", integer(Src), " to ", integer(Dst), "\n". 
-
+instructions(Is)    --> sequence(instruction,Is).
 
 run_instruction(Instruction),[StateN]    --> [State],{state_change(Instruction,State,StateN)}.
 run_instructions([]) --> [].
@@ -68,23 +52,21 @@ run9001_instructions([]) --> [].
 run9001_instructions([I|Is]) --> run9001_instruction(I),run9001_instructions(Is).
 
 p1(Out) :- 
-    phrase_from_file((sequence(aoc5:row,"\n",M),...,sequence(aoc5:instruction, Is)),"d5.txt"),
-    flatten(M,M1),zip(S1,S2,S3,S4,S5,S6,S7,S8,S9,M1), 
-    maplist(tfilter(not_nil),[S1,S2,S3,S4,S5,S6,S7,S8,S9], SN),
+    phrase_from_file((map(M),...,instructions(Is)),"d5.txt"),
+    weave(M,M1),
+    maplist(tfilter(not_nil),M1, SN),
     zip([1,2,3,4,5,6,7,8,9],SN,O),
     list_to_assoc(O,State0),
     phrase(run_instructions(Is),[State0],[State1]),
     assoc_to_values(State1,State2),
-    maplist(nth1(1),State2, State3),
-    maplist(swap(char_code),State3,Out).
+    maplist(nth1(1),State2, Out).
 
 p2(Out) :- 
-    phrase_from_file((sequence(sequence(crate," "),"\n",M),...,sequence(instruction, Is)),"d5.txt"),
-    flatten(M,M1),zip(S1,S2,S3,S4,S5,S6,S7,S8,S9,M1), 
-    maplist(tfilter(not_nil),[S1,S2,S3,S4,S5,S6,S7,S8,S9], SN),
+    phrase_from_file((map(M),...,instructions(Is)),"d5.txt"),
+    weave(M,M1),
+    maplist(tfilter(not_nil),M1, SN),
     zip([1,2,3,4,5,6,7,8,9],SN,O),
     list_to_assoc(O,State0),
     phrase(run9001_instructions(Is),[State0],[State1]),
     assoc_to_values(State1,State2),
-    maplist(nth1(1),State2, State3),
-    maplist(swap(char_code),State3,Out).
+    maplist(nth1(1),State2, Out).

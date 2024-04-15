@@ -19,9 +19,8 @@
 :- use_module(library(serialization/abnf)).
 :- use_module(library(dcgs)).
 
-:- meta_predicate sequence(3,?,?,?).
-:- meta_predicate sequence(4,?,?,?,?).
-:- meta_predicate sequence(5,?,?,?,?,?).
+:- meta_predicate sequence(1,?,?,?).
+:- meta_predicate sequence(1,?,?,?,?).
 
 alpha_lower(C)  --> [C], {member(C,"abcdefghijklmnopqrstuvwxyz")}.
 alpha_upper(C)  --> [C], {member(C,"ABCDEFGHIJKLMNOPQRSTUVWXYZ")}.
