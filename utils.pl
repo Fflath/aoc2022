@@ -1,15 +1,18 @@
-:- module(utils,[swap_args/3,(...)/2,
+:- module(utils,[swap_args/3,
+    % (...)/2,
     zip/3,not_nil/2,zip_with_length/2,
-    sort_by_length/2,zip_with_index/2,
-    iota/2,appendF/3,max/3,remove/3,min/3,
+    % sort_by_length/2,
+    zip_with_index/2,
+    % iota/2,
+    appendF/3,
+    max/3,remove/3,min/3,
     replace/4,fold_left/4,nonmember/3,swap_pair/2,
     bool_and/3,count/3,absF/2]).
 
-:- use_module(library(func)).
-:- use_module(library(clpfd)).
+:- use_module(library(clpz)).
 
-... --> [] | [_], ... .
-eos([], []).
+% ... --> [] | [_], ... .
+% eos([], []).
 
 swap_args(Pred,A,B) :- call(Pred, B,A).
 
@@ -24,8 +27,8 @@ not_nil(X,true) :- dif(X,nil).
 zip_with_length([],[]).
 zip_with_length([H|T],[L-H|T2]) :- length(H,L),zip_with_length(T,T2).
 
-sort_by_length(Ls,SLs) :-
-    SLs = zip_with_length $ keysort $ zip_with_length $ Ls.
+% sort_by_length(Ls,SLs) :-
+    % SLs = zip_with_length $ keysort $ zip_with_length $ Ls.
 
 
 zip_with_index(L,L1) :- zip_with_index_(L,L1,0).
@@ -33,9 +36,9 @@ zip_with_index_([],[],_).
 zip_with_index_([H|T],[I-H|T2],I) :- In #= I + 1, zip_with_index_(T,T2,In).
 
 
-iota(I,Indices) :- Indices = reverse $ iota_ $ I.
-iota_(0,[0]).
-iota_(N0,[N0|Is]) :- N1 #= N0 - 1, iota_(N1,Is).   
+% iota(I,Indices) :- Indices = reverse $ iota_ $ I.
+% iota_(0,[0]).
+% iota_(N0,[N0|Is]) :- N1 #= N0 - 1, iota_(N1,Is).   
 
 
 

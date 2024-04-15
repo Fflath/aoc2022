@@ -1,13 +1,22 @@
-:- set_prolog_flag(double_quotes, codes).
-:- use_module(library(dcg/basics)).
+:- module(aoc5,
+    [
+        row//1,
+        instruction//1,
+        zip/2
+    ]).
+
+:- use_module(library(dcgs)).
+:- use_module(dcg_utils).   
 :- use_module(library(pio)).
-:- use_module(library(clpfd)).
-:- use_module(library(func)).
-:- use_module(reif).
-:- use_module(library(dcg/high_order)).
+:- use_module(library(clpz)).
+:- use_module(library(reif)).
 :- use_module(library(assoc)).
-:- use_module(library(apply)).
 :- use_module(utils).
+
+% :- meta_predicate row(3,?,?,?).
+% :- meta_predicate row(1,?).
+% :- meta_predicate instruction(3,?,?,?).
+
 
 stack_op(S,V,[V|S]).
 
@@ -28,15 +37,24 @@ state_change9001((Count,Src,Dst),State,StateN) :-
     length(SH,Count), append(SH,Sn,S), append(SH,D,Dn),
     put_assoc(Src,State,Sn,State1),put_assoc(Dst,State1,Dn,StateN).
 
-crate(C) --> "[",string(C),"]".
+crate(C)     --> "[",string(C),"]".
 crate(nil)   --> "   ".
+row(Cs)     --> sequence(crate," ",Cs).
 
 not_nil(nil,false).
 not_nil(X,true) :- dif(X,nil).
 
-zip([],[],[],[],[],[],[],[],[],[]).
-zip([H1|T1],[H2|T2],[H3|T3],[H4|T4],[H5|T5],[H6|T6],[H7|T7],[H8|T8],[H9|T9],[H1,H2,H3,H4,H5,H6,H7,H8,H9|T10]) :- 
-    zip(T1,T2,T3,T4,T5,T6,T7,T8,T9,T10).
+% zip([[],[],[],[],[],[],[],[],[]],[]).
+% zip([[H1|T1],[H2|T2],[H3|T3],[H4|T4],[H5|T5],[H6|T6],[H7|T7],[H8|T8]],[H1,H2,H3,H4,H5,H6,H7,H8|T9]) :- 
+%     aoc5:zip([T1,T2,T3,T4,T5,T6,T7,T8],T9).
+
+
+zip([[],[],[],[],[],[],[],[]],[]).
+zip([[H1|T1],[H2|T2],[H3|T3],[H4|T4],[H5|T5],[H6|T6],[H7|T7],[H8|T8]],[H1,H2,H3,H4,H5,H6,H7,H8|T9]) :- 
+    zip([T1,T2,T3,T4,T5,T6,T7,T8],T9).
+
+weave([],[]).
+weave([H|T],[H1|T1]) :- zip(H,L),weave(T,L).
 
 instruction((Count,Src,Dst)) --> "move ",integer(Count)," from ", integer(Src), " to ", integer(Dst), "\n". 
 
@@ -50,7 +68,7 @@ run9001_instructions([]) --> [].
 run9001_instructions([I|Is]) --> run9001_instruction(I),run9001_instructions(Is).
 
 p1(Out) :- 
-    phrase_from_file((sequence(sequence(crate," "),"\n",M),...,sequence(instruction, Is)),"d5.txt"),
+    phrase_from_file((sequence(aoc5:row,"\n",M),...,sequence(aoc5:instruction, Is)),"d5.txt"),
     flatten(M,M1),zip(S1,S2,S3,S4,S5,S6,S7,S8,S9,M1), 
     maplist(tfilter(not_nil),[S1,S2,S3,S4,S5,S6,S7,S8,S9], SN),
     zip([1,2,3,4,5,6,7,8,9],SN,O),
