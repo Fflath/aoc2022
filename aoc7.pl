@@ -1,41 +1,38 @@
-:- set_prolog_flag(double_quotes, codes).
-:- use_module(library(dcg/basics)).
+:- use_module(library(dcgs)).
 :- use_module(library(pio)).
-:- use_module(library(clpfd)).
-:- use_module(library(func)).
-:- use_module(reif).
-:- use_module(library(dcg/high_order)).
+:- use_module(library(clpz)).
+:- use_module(library(reif)).
 :- use_module(library(assoc)).
-:- use_module(library(apply)).
+:- use_module(dcg_utils).
 :- use_module(utils).
-:- use_module(library(list_util)).
 
 directory(Dirs, Files).
 
 
 no_zero((_-0),false).
-no_zero((_-X),true) :- dif(X,0).
+no_zero((_-X),true) :- X #\= 0.
 
 command(up)             --> "$ cd ..\n".
-command(down(Dir))      --> "$ cd ", string(D),"\n",{string_to_atom(D,Dir)}.
+command(down(Dir))      --> "$ cd ", read(D),"\n",{atom_chars(Dir,D)}.
 command(nil)            --> "$ ls\n".
-file(file(Size))        --> integer(Size), " ", string(_),"\n".
-dir(nil)                --> string(_),"\n".
+file(file(Size))        --> integer(Size), " ", read(_),"\n".
+dir(nil)                --> read(_),"\n".
 line(L) --> command(L) | file(L) | dir(L).
 
-run_log([]),[(DirList-Size)|Hist] --> [(DirList-Size,Hist)].
-run_log([R|Rs])                              --> run(R),run_log(Rs).
+% run_log([]),[D|H] --> [(D,H)].
+run_log([]) --> [].
+run_log([R|Rs])                   --> run(R),run_log(Rs).
 run(down(Dir)), [([Dir|DirList]-0,[DirList-Size|Hist])]   --> [(DirList-Size,Hist)].
 run(up),        [(DirList-0, [[Cd|DirList]-Size|Hist])]   --> [([Cd|DirList]-Size,Hist)].
-run(file(S)),   [(DirList-Sn,Hist)]     --> [(DirList-Size,Hist)], {Sn #= Size+S}.
+run(file(S)),   [(DirList-Sn,Hist)]                       --> [(DirList-Size,Hist)], {Sn #= Size+S}.
 
 
 
-p1(Out) :- 
-    phrase_from_file((sequence(line, Ls)),"d7.txt"), 
-    tfilter(not_nil,Ls,L1), 
-    phrase(run_log(L1),[(""-0,[])],Y),
-    tfilter(no_zero,Y,Ds),
+p1(Out) :-  
+    phrase_from_file((sequence(line, Ls)),"d7.txt"),
+    tfilter(not_nil,Ls,L1),
+    phrase(run_log(L1), [(""-0,[])],[(X,Y)]), Z=[X|Y],
+    tfilter(no_zero,Z,Ds),
     list_to_assoc(Ds,O),
     assoc_to_keys(O,Ks), 
     reverse(Ks,Ks2),
@@ -45,19 +42,20 @@ p1(Out) :-
     sum_list(Fs,Out).
 
 p2(Out) :- 
-    phrase_from_file((sequence(line, Ls)),"d7.txt"),    
+    phrase_from_file((sequence(line, Ls)),"d7.txt"),
     tfilter(not_nil,Ls,L1),
-    phrase(run_log(L1),[(""-0,[])],Y),
-    tfilter(no_zero,Y,Ds),
-    % list_to_assoc(Ds,O),
-    zip(Ks1,_,Y),
-    K = reverse $ sort_with(length) $ list_to_set $ Ks1,
+    phrase(run_log(L1), [(""-0,[])],[(X,Y)]), Z=[X|Y],
+    tfilter(no_zero,Z,Ds),
+    zip(Ks1,_,Z),
+    list_to_set(Ks1, Ks2), sort_by(length,Ks2,Ks3),reverse(Ks3,K),
     empty_assoc(A),
     phrase(init(K), [A],[B]),
     phrase(set(Ds), [B],[C]),
     phrase(adder2(K),[C],[D]),
     assoc_to_values(D,Vs),
-    Out = nth1(1) $ sort $ tfilter(big_enough) $ Vs.
+    tfilter(big_enough, Vs, Vs2),
+    sort(Vs2, Vs3),
+    nth1(1,Vs3,Out).
 
 add_up1([D|Ds], Alist, Clist) :- add_up1_([D|Ds],Ds,Alist,Clist).
 

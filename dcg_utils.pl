@@ -46,5 +46,6 @@ integer(I)          --> digits(Ds),{number_chars(I,Ds)}.
 alpha_numeric(C)    --> alpha_lower(C) | alpha_upper(C) | digit(C).
 string(S)           --> sequence(alpha_numeric,S).
 
+% lazy read
 read([])    --> [].
 read([H|T]) --> [H], read(T).
