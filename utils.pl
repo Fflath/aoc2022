@@ -4,11 +4,12 @@
     sort_by/3,
     % sort_by_length/2,
     zip_with_index/2,
-    % iota/2,
+    iota/2,
     appendF/3,
     max/3,remove/3,min/3,
     replace/4,fold_left/4,nonmember/3,swap_pair/2,
-    bool_and/3,count/3,absF/2]).
+    bool_and/3,count/3,absF/2,
+    min_list/2]).
 
 :- use_module(library(clpz)).
 :- use_module(library(dif)).
@@ -39,11 +40,10 @@ zip_with_index_([],[],_).
 zip_with_index_([H|T],[I-H|T2],I) :- In #= I + 1, zip_with_index_(T,T2,In).
 
 
-% iota(I,Indices) :- Indices = reverse $ iota_ $ I.
-% iota_(0,[0]).
-% iota_(N0,[N0|Is]) :- N1 #= N0 - 1, iota_(N1,Is).   
-
-
+iota(End, Is)   :- phrase(iota_(0,End),Is).
+iota_(End,End)      --> [].
+iota_(Start,End)    --> [Start], 
+    {SN #= Start+1}, iota_(SN,End).
 
 appendF([]) --> [].
 appendF([L|Ls]) --> appendF(L), appendF(Ls).
@@ -90,4 +90,10 @@ count(Element, [Head|Tail], Count,CountN) :- dif(Element,Head), count(Element,Ta
 
 absF(X,Y) :- X#<0,Y#= -1*X.
 absF(X,X) :- X#>=0.
+
+
+min_list(List,Min) :- phrase(min_list_(List),[],[Min]).
+
+min_list_([])    --> [].
+min_list_   --> ml_,min_list. 
 

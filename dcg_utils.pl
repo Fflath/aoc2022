@@ -13,7 +13,9 @@
         wrap//4,
         list//1,
         string//1,
-        read//1
+        read//1,
+        single_digit_int//1,
+        push//1
     ]).
 
 :- use_module(library(lists)).
@@ -49,3 +51,16 @@ string(S)           --> sequence(alpha_numeric,S).
 % lazy read
 read([])    --> [].
 read([H|T]) --> [H], read(T).
+
+single_digit_int(0) --> "0".
+single_digit_int(1) --> "1".
+single_digit_int(2) --> "2".
+single_digit_int(3) --> "3".
+single_digit_int(4) --> "4".
+single_digit_int(5) --> "5".
+single_digit_int(6) --> "6".
+single_digit_int(7) --> "7".
+single_digit_int(8) --> "8".
+single_digit_int(9) --> "9".
+
+push(X), [X] --> [].
