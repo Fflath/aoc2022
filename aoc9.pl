@@ -1,17 +1,11 @@
-:- set_prolog_flag(double_quotes, codes).
-:- use_module(library(dcg/basics)).
 :- use_module(library(pio)).
-:- use_module(library(clpfd)).
-:- use_module(library(func)).
-:- use_module(reif).
-:- use_module(library(dcg/high_order)).
+:- use_module(library(clpz)).
+:- use_module(library(reif)).
 :- use_module(library(assoc)).
-:- use_module(library(apply)).
+:- use_module(library(dif)).
+:- use_module(library(debug)).
 :- use_module(utils).
-:- use_module(library(list_util)).
-:- use_module(library(lists)).
-
-
+:- use_module(dcg_utils).
 
 
 move(x, X-Y, Xn-Y) :- Xn #= X + 1.
@@ -36,26 +30,26 @@ catchup(1- -1, Tail, Tail).
 catchup(1-0, Tail, Tail).
 catchup(1-1, Tail, Tail).
 
-catchup(-2- -1,Tail,Tn) :- Tn = move(left) $ move(down) $ Tail.
-catchup(-2-0,Tail,Tn) :- Tn =   move(left) $ Tail.
-catchup(-2-1,Tail,Tn) :- Tn =   move(left) $ move(up) $ Tail.
+catchup(-2- -1,Tail,Tn) :- move(down, Tail, T0), move(left,T0,Tn).
+catchup(-2-0,Tail,Tn) :-  move(left, Tail, Tn).
+catchup(-2-1,Tail,Tn) :- move(up, Tail, T0), move(left,T0,Tn).
 
-catchup(2- -1,Tail,Tn) :- Tn = move(right) $ move(down) $ Tail.
-catchup(2-0,Tail,Tn) :- Tn =   move(right) $ Tail.
-catchup(2-1,Tail,Tn) :- Tn =   move(right) $ move(up) $ Tail.
+catchup(2- -1,Tail,Tn) :- move(down, Tail, T0),move(right,T0,Tn).
+catchup(2-0,Tail,Tn) :- move(right, Tail, Tn).
+catchup(2-1,Tail,Tn) :- move(right, Tail, T0), move(up,T0,Tn).
 
-catchup(-1-2,Tail,Tn) :- Tn = move(left) $ move(up) $ Tail.
-catchup(0-2,Tail,Tn) :- Tn =               move(up) $ Tail.
-catchup(1-2,Tail,Tn) :- Tn = move(right) $ move(up) $ Tail.
+catchup(-1-2,Tail,Tn) :- move(left,Tail,T0), move(up,T0,Tn).
+catchup(0-2,Tail,Tn) :- move(up,Tail,Tn).
+catchup(1-2,Tail,Tn) :- move(right,Tail,T0), move(up,T0,Tn).
 
-catchup(-1- -2,Tail,Tn) :- Tn = move(left) $ move(down) $ Tail.
-catchup(0- -2,Tail,Tn) :- Tn =               move(down) $ Tail.
-catchup(1- -2,Tail,Tn) :- Tn = move(right) $ move(down) $ Tail.
+catchup(-1- -2,Tail,Tn) :- move(left,Tail,T0),move(down,T0,Tn).
+catchup(0- -2,Tail,Tn) :- move(down,Tail,Tn).
+catchup(1- -2,Tail,Tn) :- move(right,Tail,T0), move(down,T0,Tn).
 
-catchup(-2- -2,Tail,Tn) :- Tn = move(left) $ move(down) $ Tail.
-catchup(-2- 2,Tail,Tn) :- Tn = move(left) $ move(up) $ Tail.
-catchup(2- -2, Tail,Tn) :- Tn = move(right) $ move(down) $ Tail.
-catchup(2-2, Tail, Tn) :- Tn = move(right) $ move(up) $ Tail.
+catchup(-2- -2,Tail,Tn) :- move(left,Tail,T0), move(down,T0,Tn).
+catchup(-2- 2,Tail,Tn) :- move(left,Tail,T0), move(up,T0,Tn).
+catchup(2- -2, Tail,Tn) :- move(right,Tail,T0), move(down,T0,Tn).
+catchup(2-2, Tail, Tn) :- move(right,Tail,T0), move(up,T0,Tn).
 
 
 step(up-X)      --> "U ", integer(X),"\n".
@@ -105,3 +99,4 @@ p2(O) :-
     phrase_from_file(sequence(step, Steps),"d9.txt"), 
     phrase(runner2(Steps), [0-0,0-0,0-0,0-0,0-0,0-0,0-0,0-0,0-0,0-0,[0-0]],[_,_,_,_,_,_,_,_,_,_,X]), 
     list_to_set(X,XS), length(XS,O).
+
