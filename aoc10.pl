@@ -1,15 +1,12 @@
-:- set_prolog_flag(double_quotes, codes).
-:- use_module(library(dcg/basics)).
 :- use_module(library(pio)).
-:- use_module(library(clpfd)).
-:- use_module(library(func)).
-:- use_module(reif).
-:- use_module(library(dcg/high_order)).
+:- use_module(library(clpz)).
+:- use_module(library(reif)).
 :- use_module(library(assoc)).
-:- use_module(library(apply)).
+:- use_module(library(dif)).
+:- use_module(library(debug)).
 :- use_module(utils).
-:- use_module(library(list_util)).
-:- use_module(library(lists)).
+:- use_module(dcg_utils).
+:- use_module(library(format)).
 
 
 instr(I) --> instr_addx(I) | instr_noop(I).
@@ -59,16 +56,15 @@ screen(Z),[Cycle,X,Signals,Times,["#"|Screen]]               --> [Cycle,X,Signal
 screen(_),[Cycle,X,Signals,Times,["."|Screen]]               --> [Cycle,X,Signals,Times,Screen].
 
 splitter([])    --> [].
-splitter([(I)|Is]) --> {length(I,40)},string(I0),{I=reverse $ flatten $ I0},splitter(Is).
-
-codes_string(C,S) :- string_codes(S,C).
+splitter([(I)|Is]) --> {length(I0,40)},seq(I0),{reverse(I0,I)},splitter(Is).
 
 printer([]).
-printer([S|Ss]) :- write(S),nl,printer(Ss).
+printer([S|Ss]) :- phrase(seqq(S),S0), format("~s~n",[S0]),printer(Ss).
 
 p2 :- 
     phrase_from_file(sequence(instr,Is),"d10.txt"),
-    phrase(run2(Is),[1,1,[],[],[]],[_,_,_,_,X]), 
-    phrase(splitter(Xs),X), reverse(Xs, X_codes),
-    maplist(codes_string,X_codes,X_strings),
-    printer(X_strings).
+    phrase(run2(Is),[1,1,[],[],[]],[_,_,_,_,X]),
+    phrase(splitter(I),X),
+    reverse(I,I0),
+    printer(I0).
+

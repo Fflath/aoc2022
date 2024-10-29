@@ -21,6 +21,7 @@
 :- use_module(library(lists)).
 :- use_module(library(serialization/abnf)).
 :- use_module(library(dcgs)).
+:- use_module(library(clpz)).
 
 :- meta_predicate sequence(1,?,?,?).
 :- meta_predicate sequence(1,?,?,?,?).
@@ -45,6 +46,7 @@ list(L)                         --> "[",sequence(alpha_numeric,',',L),"]".
 
 digits([D|Ds])          --> digit(D),sequence(digit,Ds).
 integer(I)          --> digits(Ds),{number_chars(I,Ds)}.
+integer(I)          --> "-",digits(Ds),{number_chars(I0,Ds),I #= -1 * I0}.
 alpha_numeric(C)    --> alpha_lower(C) | alpha_upper(C) | digit(C).
 string(S)           --> sequence(alpha_numeric,S).
 
